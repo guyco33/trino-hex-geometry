@@ -7,10 +7,15 @@ TODO:
 
 package com.facebook.presto.hex.geometry.functions;
 import com.facebook.presto.spi.function.*;
+import com.facebook.presto.spi.type.ArrayType;
+import com.facebook.presto.spi.type.BigintType;
 import com.facebook.presto.spi.type.StandardTypes;
+
+import static io.airlift.slice.Slices.utf8Slice;
 import static java.lang.Math.toIntExact;
 import com.facebook.presto.spi.block.*;
 import io.airlift.slice.Slice;
+import com.gojuno.hexgridgeo.PointGeo;
 
 import static com.facebook.presto.spi.type.BigintType.BIGINT;
 import static com.facebook.presto.spi.type.DoubleType.DOUBLE;
@@ -123,6 +128,69 @@ public class HexGeometryFunctions {
         return hexCover(polygon, 512);
     }
 
+    @ScalarFunction("hex_corners")
+    @Description("Returns array(double) of corner points at size 512: {{lon0,lat0},{lon1,lat1}....,{lon0,lat0}}")
+    @SqlType("array(array(double))")
+    @SqlNullable
+    public static Block hex_corners(
+            @SqlType(StandardTypes.BIGINT) long hex_code)
+    {
+        return hex_corners(hex_code, 512);
+    }
+
+    @ScalarFunction("hex_corners")
+    @Description("Returns array(double) of corner points: {{lon0,lat0},{lon1,lat1}....,{lon0,lat0}}")
+    @SqlType("array(array(double))")
+    @SqlNullable
+    public static Block hex_corners(
+            @SqlType(StandardTypes.BIGINT) long hex_code,
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
+        PointGeo[] corners = HexHelper.hexCorners(hex_code, size);
+        if (corners.length == 0)
+            return null;
+        ArrayType arrayType = new ArrayType(DOUBLE);
+        BlockBuilder builder = arrayType.createBlockBuilder(null, corners.length+1);
+        for (int i=0; i<corners.length; i++) {
+            arrayType.writeObject(builder, pointArrayBlock(corners[i].getLon(), corners[i].getLat()));
+        }
+        arrayType.writeObject(builder, pointArrayBlock(corners[0].getLon(), corners[0].getLat()));
+        return builder.build();
+    }
+
+    @ScalarFunction("hex_corners")
+    @Description("Returns corner points at size 512 in formatted string (eg: wkt, str)")
+    @SqlType(StandardTypes.VARCHAR)
+    @SqlNullable
+    public static Slice hex_corners(
+            @SqlType(StandardTypes.BIGINT) long hex_code,
+            @SqlType(StandardTypes.VARCHAR) Slice format)
+    {
+        if (format.toStringUtf8().toLowerCase().equals("wkt"))
+            return utf8Slice(HexHelper.hexCornersAsWkt(hex_code, 512));
+        else if (format.toStringUtf8().toLowerCase().equals("str"))
+            return utf8Slice(HexHelper.hexCornersAsStr(hex_code, 512));
+        else
+            return null;
+    }
+
+    @ScalarFunction("hex_corners")
+    @Description("Returns corner points in formatted string (eg: wkt, str)")
+    @SqlType(StandardTypes.VARCHAR)
+    @SqlNullable
+    public static Slice hex_corners(
+            @SqlType(StandardTypes.BIGINT) long hex_code,
+            @SqlType(StandardTypes.DOUBLE) double size,
+            @SqlType(StandardTypes.VARCHAR) Slice format)
+    {
+        if (format.toStringUtf8().toLowerCase().equals("wkt"))
+            return utf8Slice(HexHelper.hexCornersAsWkt(hex_code, size));
+        else if (format.toStringUtf8().toLowerCase().equals("str"))
+            return utf8Slice(HexHelper.hexCornersAsStr(hex_code, size));
+        else
+            return null;
+    }
+
     public static Block hexArrayBlock(Long[] hex_codes) {
         BlockBuilder blockBuilder = BIGINT.createBlockBuilder(null, hex_codes.length);
         for (Long c : hex_codes)
@@ -130,10 +198,10 @@ public class HexGeometryFunctions {
         return blockBuilder.build();
     }
 
-    public static Block pointArrayBlock(Double lat, Double lng) {
+    public static Block pointArrayBlock(Double x, Double y) {
         BlockBuilder blockBuilder = DOUBLE.createBlockBuilder(null, 2);
-        blockBuilder.writeObject(lat);
-        blockBuilder.writeObject(lng);
+        DOUBLE.writeDouble(blockBuilder,x);
+        DOUBLE.writeDouble(blockBuilder,y);
         return blockBuilder.build();
     }
 }

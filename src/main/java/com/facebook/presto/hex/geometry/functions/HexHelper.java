@@ -67,12 +67,38 @@ public class HexHelper {
         return points;
     }
 
+    public static PointGeo[] hexCorners(long hex_code, double size) {
+        HexGridGeo grid = new HexGridGeo(Orientation.FLAT, size, ProjectionSM.INSTANCE);
+        PointGeo[] corners = grid.hexCorners(grid.hexFromCode(hex_code));
+        return corners;
+    }
 
+    public static String hexCornersAsWkt(long hex_code, double size) {
+        PointGeo[] corners = hexCorners(hex_code, size);
+        StringBuffer wktPolygon = new StringBuffer("POLYGON ((");
+        for (int i=0; i<corners.length; i++) {
+            wktPolygon.append(corners[i].getLon()+" "+corners[i].getLat()+",");
+        }
+        wktPolygon.append(corners[0].getLon()+" "+corners[0].getLat()+"))");
+        return wktPolygon.toString();
+    }
+
+    public static String hexCornersAsStr(long hex_code, double size) {
+        PointGeo[] corners = hexCorners(hex_code, size);
+        StringBuffer wktPolygon = new StringBuffer("[");
+        for (int i=0; i<corners.length; i++) {
+            wktPolygon.append("["+corners[i].getLon()+","+corners[i].getLat()+"],");
+        }
+        wktPolygon.append("["+corners[0].getLon()+","+corners[0].getLat()+"]]");
+        return wktPolygon.toString();
+    }
 
     public static void main(String[] args) {
-        System.out.println(hexCode(40.3,-73.5, 512));
-        for (long h: hexNeighbors(hexCode(40.3,-73.5, 512), 5, 521))
-            System.out.println(h);
+        long hex = hexCode(40.3,-73.5, 512);
+        System.out.println(hex);
+        System.out.println(hexCornersAsStr(hex, 512));
+//        for (long n: hexNeighbors(hex, 5, 521))
+//            System.out.println(n);
 
 //        HexGridGeo grid = new HexGridGeo(Orientation.FLAT, 500, ProjectionSM.INSTANCE);
 //        Hex hex = grid.hexAt(new PointGeo(-73.5, 40.3));
