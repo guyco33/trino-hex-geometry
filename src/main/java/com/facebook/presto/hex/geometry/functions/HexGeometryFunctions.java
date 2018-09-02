@@ -8,7 +8,6 @@ TODO:
 package com.facebook.presto.hex.geometry.functions;
 import com.facebook.presto.spi.function.*;
 import com.facebook.presto.spi.type.ArrayType;
-import com.facebook.presto.spi.type.BigintType;
 import com.facebook.presto.spi.type.StandardTypes;
 
 import static io.airlift.slice.Slices.utf8Slice;
@@ -55,7 +54,7 @@ public class HexGeometryFunctions {
             @SqlType(StandardTypes.DOUBLE) double size) {
 
         Long[] neighbors = HexHelper.hexNeighbors(hex_code, toIntExact(layers), size);
-        return hexArrayBlock(neighbors);
+        return longArrayBlock(neighbors);
     }
 
     @ScalarFunction("hex_neighbors")
@@ -107,6 +106,25 @@ public class HexGeometryFunctions {
         return hexCenter(hex_code, 512);
     }
 
+    @ScalarFunction("hex_qr")
+    @Description("Returns q,r for hex code and size")
+    @SqlType("array(bigint)")
+    @SqlNullable
+    public static Block hexQR(
+            @SqlType(StandardTypes.BIGINT) long hex_code,
+            @SqlType(StandardTypes.DOUBLE) double size) {
+        return longArrayBlock(HexHelper.hexQR(hex_code, size));
+    }
+
+    @ScalarFunction("hex_qr")
+    @Description("Returns q,r for hex code at size 512")
+    @SqlType("array(bigint)")
+    @SqlNullable
+    public static Block hexQR(
+            @SqlType(StandardTypes.BIGINT) long hex_code) {
+        return hexQR(hex_code, 512);
+    }
+
     @ScalarFunction("hex_cover")
     @Description("Returns hex cover for polygon and size")
     @SqlType("array(bigint)")
@@ -115,7 +133,7 @@ public class HexGeometryFunctions {
             @SqlType(StandardTypes.VARCHAR) Slice polygon,
             @SqlType(StandardTypes.DOUBLE) double size) {
         try {
-            return hexArrayBlock(HexHelper.hexCover(polygon.toStringUtf8(), size));
+            return longArrayBlock(HexHelper.hexCover(polygon.toStringUtf8(), size));
         } catch (Exception e) {return null;}
     }
 
@@ -191,9 +209,9 @@ public class HexGeometryFunctions {
             return null;
     }
 
-    public static Block hexArrayBlock(Long[] hex_codes) {
-        BlockBuilder blockBuilder = BIGINT.createBlockBuilder(null, hex_codes.length);
-        for (Long c : hex_codes)
+    public static Block longArrayBlock(Long[] longs) {
+        BlockBuilder blockBuilder = BIGINT.createBlockBuilder(null, longs.length);
+        for (Long c : longs)
             blockBuilder.writeLong(c);
         return blockBuilder.build();
     }

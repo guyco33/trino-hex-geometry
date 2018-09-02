@@ -34,6 +34,13 @@ public class HexHelper {
         return new double[]{pointGeo.getLat(), pointGeo.getLon()};
     }
 
+    public static Long[] hexQR(long hex_code, double size) {
+        if (size<0) return null;
+        HexGridGeo grid = new HexGridGeo(Orientation.FLAT, size, ProjectionSM.INSTANCE);
+        Hex hex = grid.hexFromCode(hex_code);
+        return new Long[]{hex.getQ(), hex.getR()};
+    }
+
     public static Long[] hexCover(String polygon, double size) {
         if (size<0) return null;
         PointGeo[] points = pointsFromPolygon(polygon);
