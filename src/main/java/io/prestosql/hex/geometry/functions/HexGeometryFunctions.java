@@ -5,19 +5,19 @@ TODO:
     hex_cover(polygon, size)
  */
 
-package com.facebook.presto.hex.geometry.functions;
-import com.facebook.presto.spi.function.*;
-import com.facebook.presto.spi.type.ArrayType;
-import com.facebook.presto.spi.type.StandardTypes;
+package io.prestosql.hex.geometry.functions;
+import io.prestosql.spi.function.*;
+import io.prestosql.spi.type.ArrayType;
+import io.prestosql.spi.type.StandardTypes;
 
 import static io.airlift.slice.Slices.utf8Slice;
 import static java.lang.Math.toIntExact;
-import com.facebook.presto.spi.block.*;
+import io.prestosql.spi.block.*;
 import io.airlift.slice.Slice;
 import com.gojuno.hexgridgeo.PointGeo;
 
-import static com.facebook.presto.spi.type.BigintType.BIGINT;
-import static com.facebook.presto.spi.type.DoubleType.DOUBLE;
+import static io.prestosql.spi.type.BigintType.BIGINT;
+import static io.prestosql.spi.type.DoubleType.DOUBLE;
 
 public class HexGeometryFunctions {
 

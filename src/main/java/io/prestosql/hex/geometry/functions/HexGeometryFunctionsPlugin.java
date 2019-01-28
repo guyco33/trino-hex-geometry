@@ -1,6 +1,6 @@
-package com.facebook.presto.hex.geometry.functions;
+package io.prestosql.hex.geometry.functions;
 
-import com.facebook.presto.spi.Plugin;
+import io.prestosql.spi.Plugin;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package com.facebook.presto.hex.geometry.functions;
+package io.prestosql.hex.geometry.functions;
 
 import com.gojuno.hexgrid.*;
 import com.gojuno.hexgridgeo.*;

@@ -40,6 +40,6 @@
       </library>
     </orderEntry>
     <orderEntry type="library" name="com.google.guava:guava:18.0" level="project" />
-    <orderEntry type="library" name="com.facebook.presto:presto-spi:0.200" level="project" />
+    <orderEntry type="library" name="io.prestosql:presto-spi:300" level="project" />
   </component>
 </module>
