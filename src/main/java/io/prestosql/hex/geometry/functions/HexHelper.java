@@ -2,7 +2,6 @@ package io.prestosql.hex.geometry.functions;
 
 import com.gojuno.hexgrid.*;
 import com.gojuno.hexgridgeo.*;
-import java.util.ArrayList;
 import java.util.regex.Pattern;
 
 public class HexHelper {
