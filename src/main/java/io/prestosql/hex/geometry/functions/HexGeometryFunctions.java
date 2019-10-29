@@ -132,9 +132,9 @@ public class HexGeometryFunctions {
     public static Block hexCover(
             @SqlType(StandardTypes.VARCHAR) Slice polygon,
             @SqlType(StandardTypes.DOUBLE) double size) {
-        try {
-            return longArrayBlock(HexHelper.hexCover(polygon.toStringUtf8(), size));
-        } catch (Exception e) {return null;}
+//        try {
+        return longArrayBlock(HexHelper.hexCover(polygon.toStringUtf8(), size));
+//        } catch (Exception e) {return null;}
     }
 
     @ScalarFunction("hex_cover")

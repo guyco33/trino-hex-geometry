@@ -54,22 +54,18 @@ public class HexHelper {
     }
 
     private static PointGeo[] pointsFromPolygon(String polygon) {
-        String coord = "[-]?[0-9]+[.]?[-]?[0-9]+";
-        String spaces = "(\\s)+";
-        String ospaces = "(\\s)*";
-        String point = ospaces+coord+spaces+coord+ospaces;
+        String start_pattern = "^(\\s)*[Pp][Oo][Ll][Yy][Gg][Oo][Nn](\\s)*[(](\\s)*[(]";
+        String end_pattern = "[)](\\s)*[)](\\s)*$";
 
-        String pattern = "POLYGON[(][(]"+point+"(,"+point+"){2,}?[)][)]";
-        polygon = polygon.toUpperCase();
-        Boolean match = Pattern.matches(pattern, polygon);
+        if (!Pattern.matches(start_pattern+"[0-9.,\\-\\s\\t]+"+end_pattern, polygon)) {
+            return null;
+        }
         PointGeo[] points = null;
-        if (match) {
-            String[] items = Pattern.compile(ospaces+","+ospaces).split(polygon.replace("POLYGON((","").replace("))",""));
-            points = new PointGeo[items.length];
-            for (int i=0; i<points.length; i++) {
-                String[] nums = items[i].trim().split(spaces);
-                points[i] = new PointGeo(Double.parseDouble(nums[0]), Double.parseDouble(nums[1]));
-            }
+        String[] items = polygon.replaceAll(start_pattern,"").replaceAll(end_pattern,"").split(",");
+        points = new PointGeo[items.length];
+        for (int i=0; i<points.length; i++) {
+            String[] nums = items[i].trim().split("(\\s)+");
+            points[i] = new PointGeo(Double.parseDouble(nums[0]), Double.parseDouble(nums[1]));
         }
         return points;
     }
