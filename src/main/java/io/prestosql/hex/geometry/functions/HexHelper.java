@@ -43,6 +43,7 @@ public class HexHelper {
     public static Long[] hexCover(String polygon, double size) {
         if (size<0) return null;
         PointGeo[] points = pointsFromPolygon(polygon);
+        if (points == null || points.length < 2) return null;
         HexGridGeo grid = new HexGridGeo(Orientation.FLAT, size, ProjectionSM.INSTANCE);
         Region region = grid.createRegion(points);
         Hex[] hexes = region.getHexes();
@@ -52,21 +53,26 @@ public class HexHelper {
         return codes;
     }
 
-    private static PointGeo[] pointsFromPolygon(String polygon) {
+    public static PointGeo[] pointsFromPolygon(String polygon) {
         String start_pattern = "^(\\s)*[Pp][Oo][Ll][Yy][Gg][Oo][Nn](\\s)*[(](\\s)*[(]";
         String end_pattern = "[)](\\s)*[)](\\s)*$";
 
-        if (!Pattern.matches(start_pattern+"[0-9.,\\-\\s\\t]+"+end_pattern, polygon)) {
+        try {
+            if (!Pattern.matches(start_pattern + "[0-9.,\\-\\s\\t]+" + end_pattern, polygon)) {
+                return null;
+            }
+            PointGeo[] points = null;
+            String[] items = polygon.replaceAll(start_pattern, "").replaceAll(end_pattern, "").split(",");
+            points = new PointGeo[items.length];
+            for (int i = 0; i < points.length; i++) {
+                String[] nums = items[i].trim().split("(\\s)+");
+                points[i] = new PointGeo(Double.parseDouble(nums[0]), Double.parseDouble(nums[1]));
+            }
+            return points;
+        }
+        catch (Exception e) {
             return null;
         }
-        PointGeo[] points = null;
-        String[] items = polygon.replaceAll(start_pattern,"").replaceAll(end_pattern,"").split(",");
-        points = new PointGeo[items.length];
-        for (int i=0; i<points.length; i++) {
-            String[] nums = items[i].trim().split("(\\s)+");
-            points[i] = new PointGeo(Double.parseDouble(nums[0]), Double.parseDouble(nums[1]));
-        }
-        return points;
     }
 
     public static PointGeo[] hexCorners(long hex_code, double size) {
