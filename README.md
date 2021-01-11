@@ -1,7 +1,7 @@
-# presto-hex-geometry
-Presto functions for geospatial hexagons
+# trino-hex-geometry
+Trino functions for geospatial hexagons
 
-Copy jars to presto plugin folder and enjoy some useful gojuno hexgrid functions
+Copy jars to Trino plugin folder and enjoy some useful gojuno hexgrid functions
 
 Examples:
 

@@ -5,19 +5,19 @@ TODO:
     hex_cover(polygon, size)
  */
 
-package io.prestosql.hex.geometry.functions;
-import io.prestosql.spi.function.*;
-import io.prestosql.spi.type.ArrayType;
-import io.prestosql.spi.type.StandardTypes;
+package io.trino.hex.geometry.functions;
+import io.trino.spi.function.*;
+import io.trino.spi.type.ArrayType;
+import io.trino.spi.type.StandardTypes;
 
 import static io.airlift.slice.Slices.utf8Slice;
 import static java.lang.Math.toIntExact;
-import io.prestosql.spi.block.*;
+import io.trino.spi.block.*;
 import io.airlift.slice.Slice;
 import com.gojuno.hexgridgeo.PointGeo;
 
-import static io.prestosql.spi.type.BigintType.BIGINT;
-import static io.prestosql.spi.type.DoubleType.DOUBLE;
+import static io.trino.spi.type.BigintType.BIGINT;
+import static io.trino.spi.type.DoubleType.DOUBLE;
 
 public class HexGeometryFunctions {
 

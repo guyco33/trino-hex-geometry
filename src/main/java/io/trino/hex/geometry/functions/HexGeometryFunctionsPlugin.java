@@ -1,6 +1,6 @@
-package io.prestosql.hex.geometry.functions;
+package io.trino.hex.geometry.functions;
 
-import io.prestosql.spi.Plugin;
+import io.trino.spi.Plugin;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Set;

@@ -1,4 +1,4 @@
-package io.prestosql.hex.geometry.functions;
+package io.trino.hex.geometry.functions;
 
 import com.gojuno.hexgrid.*;
 import com.gojuno.hexgridgeo.*;

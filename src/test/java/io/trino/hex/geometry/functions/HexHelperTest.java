@@ -1,4 +1,4 @@
-package io.prestosql.hex.geometry.functions;
+package io.trino.hex.geometry.functions;
 
 import org.testng.annotations.Test;
 
