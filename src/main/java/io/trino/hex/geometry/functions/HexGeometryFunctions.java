@@ -212,7 +212,7 @@ public class HexGeometryFunctions {
     public static Block longArrayBlock(Long[] longs) {
         BlockBuilder blockBuilder = BIGINT.createBlockBuilder(null, longs.length);
         for (Long c : longs)
-            blockBuilder.writeLong(c);
+            BIGINT.writeLong(blockBuilder, c);
         return blockBuilder.build();
     }
 
