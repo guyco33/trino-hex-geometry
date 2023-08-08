@@ -4,8 +4,8 @@
 TODO:
     hex_cover(polygon, size)
  */
-
 package io.trino.hex.geometry.functions;
+
 import io.trino.spi.function.*;
 import io.trino.spi.type.ArrayType;
 import io.trino.spi.type.StandardTypes;
@@ -19,7 +19,8 @@ import com.gojuno.hexgridgeo.PointGeo;
 import static io.trino.spi.type.BigintType.BIGINT;
 import static io.trino.spi.type.DoubleType.DOUBLE;
 
-public class HexGeometryFunctions {
+public class HexGeometryFunctions
+{
 
     private HexGeometryFunctions() {}
 
@@ -30,8 +31,14 @@ public class HexGeometryFunctions {
     public static Long hexCode(
             @SqlType(StandardTypes.DOUBLE) double lat,
             @SqlType(StandardTypes.DOUBLE) double lon,
-            @SqlType(StandardTypes.DOUBLE) double size) {
-        return HexHelper.hexCode(lat, lon, size);
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
+        try {
+            return HexHelper.hexCode(lat, lon, size);
+        }
+        catch (com.gojuno.morton.Morton64Exception e) {
+            return null;
+        }
     }
 
     @ScalarFunction("hex_code")
@@ -40,7 +47,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Long hexCode(
             @SqlType(StandardTypes.DOUBLE) double lat,
-            @SqlType(StandardTypes.DOUBLE) double lon) {
+            @SqlType(StandardTypes.DOUBLE) double lon)
+    {
         return hexCode(lat, lon, 512);
     }
 
@@ -51,8 +59,8 @@ public class HexGeometryFunctions {
     public static Block hexNeighbors(
             @SqlType(StandardTypes.BIGINT) long hex_code,
             @SqlType(StandardTypes.INTEGER) long layers,
-            @SqlType(StandardTypes.DOUBLE) double size) {
-
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
         Long[] neighbors = HexHelper.hexNeighbors(hex_code, toIntExact(layers), size);
         return longArrayBlock(neighbors);
     }
@@ -63,7 +71,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Block hexNeighbors(
             @SqlType(StandardTypes.BIGINT) long hex_code,
-            @SqlType(StandardTypes.INTEGER) long layers) {
+            @SqlType(StandardTypes.INTEGER) long layers)
+    {
         return hexNeighbors(hex_code, toIntExact(layers), 512);
     }
 
@@ -73,7 +82,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Block hexNeighbors(
             @SqlType(StandardTypes.BIGINT) long hex_code,
-            @SqlType(StandardTypes.DOUBLE) double size) {
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
         return hexNeighbors(hex_code, 1, size);
     }
 
@@ -82,7 +92,8 @@ public class HexGeometryFunctions {
     @SqlType("array(bigint)")
     @SqlNullable
     public static Block hexNeighbors(
-            @SqlType(StandardTypes.BIGINT) long hex_code) {
+            @SqlType(StandardTypes.BIGINT) long hex_code)
+    {
         return hexNeighbors(hex_code, 1, 512);
     }
 
@@ -92,7 +103,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Block hexCenter(
             @SqlType(StandardTypes.BIGINT) long hex_code,
-            @SqlType(StandardTypes.DOUBLE) double size) {
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
         double[] point = HexHelper.hexCenter(hex_code, size);
         return pointArrayBlock(point[0], point[1]);
     }
@@ -102,7 +114,8 @@ public class HexGeometryFunctions {
     @SqlType("array(double)")
     @SqlNullable
     public static Block hexCenter(
-            @SqlType(StandardTypes.BIGINT) long hex_code) {
+            @SqlType(StandardTypes.BIGINT) long hex_code)
+    {
         return hexCenter(hex_code, 512);
     }
 
@@ -112,7 +125,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Block hexQR(
             @SqlType(StandardTypes.BIGINT) long hex_code,
-            @SqlType(StandardTypes.DOUBLE) double size) {
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
         return longArrayBlock(HexHelper.hexQR(hex_code, size));
     }
 
@@ -121,7 +135,8 @@ public class HexGeometryFunctions {
     @SqlType("array(bigint)")
     @SqlNullable
     public static Block hexQR(
-            @SqlType(StandardTypes.BIGINT) long hex_code) {
+            @SqlType(StandardTypes.BIGINT) long hex_code)
+    {
         return hexQR(hex_code, 512);
     }
 
@@ -131,7 +146,8 @@ public class HexGeometryFunctions {
     @SqlNullable
     public static Block hexCover(
             @SqlType(StandardTypes.VARCHAR) Slice polygon,
-            @SqlType(StandardTypes.DOUBLE) double size) {
+            @SqlType(StandardTypes.DOUBLE) double size)
+    {
         Long[] codes = HexHelper.hexCover(polygon.toStringUtf8(), size);
         if (codes == null) return null;
         return longArrayBlock(codes);
@@ -142,7 +158,8 @@ public class HexGeometryFunctions {
     @SqlType("array(bigint)")
     @SqlNullable
     public static Block hex_cover(
-            @SqlType(StandardTypes.VARCHAR) Slice polygon) {
+            @SqlType(StandardTypes.VARCHAR) Slice polygon)
+    {
         return hexCover(polygon, 512);
     }
 
@@ -209,14 +226,16 @@ public class HexGeometryFunctions {
             return null;
     }
 
-    public static Block longArrayBlock(Long[] longs) {
+    public static Block longArrayBlock(Long[] longs)
+    {
         BlockBuilder blockBuilder = BIGINT.createBlockBuilder(null, longs.length);
         for (Long c : longs)
             BIGINT.writeLong(blockBuilder, c);
         return blockBuilder.build();
     }
 
-    public static Block pointArrayBlock(Double x, Double y) {
+    public static Block pointArrayBlock(Double x, Double y)
+    {
         BlockBuilder blockBuilder = DOUBLE.createBlockBuilder(null, 2);
         DOUBLE.writeDouble(blockBuilder,x);
         DOUBLE.writeDouble(blockBuilder,y);

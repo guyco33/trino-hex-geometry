@@ -6,7 +6,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 public class HexGeometryFunctionsPlugin
-    implements Plugin
+        implements Plugin
 {
     @Override
     public Set<Class<?>> getFunctions()
