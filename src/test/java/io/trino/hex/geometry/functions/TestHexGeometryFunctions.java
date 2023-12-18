@@ -1,18 +1,44 @@
 package io.trino.hex.geometry.functions;
 
-import org.testng.annotations.Test;
+import io.trino.sql.query.QueryAssertions;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+import org.junit.jupiter.api.parallel.Execution;
+
+import java.util.Optional;
+
 import static io.airlift.slice.Slices.utf8Slice;
 import static io.trino.hex.geometry.functions.HexGeometryFunctions.hexCode;
 import static io.trino.hex.geometry.functions.HexGeometryFunctions.hex_cover;
-import static org.testng.Assert.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS;
+import static org.junit.jupiter.api.parallel.ExecutionMode.CONCURRENT;
 
-public class HexGeometryFunctionsTest
+@TestInstance(PER_CLASS)
+@Execution(CONCURRENT)
+public class TestHexGeometryFunctions
 {
+    private QueryAssertions assertions;
+
+    public TestHexGeometryFunctions()
+    {
+        assertions = new QueryAssertions();
+        assertions.addPlugin(new HexGeometryFunctionsPlugin());
+    }
+
+    @AfterAll
+    public void teardown()
+    {
+        assertions.close();
+    }
     @Test
     public void testHexCode()
     {
         assertEquals(hexCode(-90, 63.44, 512), null);
-        assertEquals(hexCode(51.51, -0.14, 512), 4611686018471592858L);
+        assertEquals(hexCode(51.51, -0.14, 512), Optional.of(4611686018471592858L).get());
+        assertThat(assertions.expression("hex_code(32.4,28.5, 512.0)")).isEqualTo(25202343L);
     }
 
     @Test
@@ -38,5 +64,10 @@ public class HexGeometryFunctionsTest
         assertEquals(hex_cover(utf8Slice("POLYGON((37.2419964 55.69297, 37.2419964   ))")), null);
         assertEquals(hex_cover(utf8Slice("POLYGON((37.2419964 55.69297   ))")), null);
         assertEquals(hex_cover(utf8Slice("POLYGON((37.2419964    ))")), null);
+
+        assertThat(assertions.expression("hex_cover('POLYGON((37.2419964    ))')")).isNull();
+        assertThat(assertions.query(
+                "SELECT hex_cover('POLYGON((-4.260420799255371 55.860357179566456,-4.261343479156494 55.858755520831274,-4.261021614074707 55.85638301775982,-4.257180690765381 55.856395061288424,-4.256504774093628 55.85834004217841,-4.256665706634522 55.861176047244776,-4.259583950042725 55.86120013132693,-4.260420799255371 55.860357179566456))')"))
+                .containsAll("VALUES (array[cast(4611686018562407492 as bigint), 4611686018562407494, 4611686018562406123, 4611686018562407489, 4611686018562407491])");
     }
 }

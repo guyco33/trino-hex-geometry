@@ -1,17 +1,18 @@
 package io.trino.hex.geometry.functions;
+import org.junit.jupiter.api.Test;
 
-import org.testng.annotations.Test;
+import java.util.Optional;
 
 import static io.trino.hex.geometry.functions.HexHelper.hexCode;
 import static io.trino.hex.geometry.functions.HexHelper.hexCornersAsStr;
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
 
-public class HexHelperTest
+public class TestHexHelper
 {
     @Test
     public void testHexCode()
     {
-        assertEquals(hexCode(40.3,-73.5, 512), 4611686018641914366L);
+        assertEquals(hexCode(40.3,-73.5, 512), Optional.of(4611686018641914366L).get());
         assertEquals(hexCornersAsStr(hexCode(40.3,-73.5, 512), 512),
                 "[[-73.49800058997735,40.29826336390476],[-73.5003002771047,40.301301215076144],[-73.5048996513594,40.301301215076144],[-73.50719933848674,40.29826336390476],[-73.5048996513594,40.29522537613972],[-73.5003002771047,40.29522537613972],[-73.49800058997735,40.29826336390476]]");
     }
